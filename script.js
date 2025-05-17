@@ -3,35 +3,42 @@ mainEl.style.backgroundColor = "var(--main-bg)";
 mainEl.innerHTML = `<h1>Dom Manipulation<h1/>`;
 mainEl.classList.add("flex-ctr");
 
+//let topMenuEl = `<nav id="top-menu">`
 let topMenuEl = document.getElementById("top-menu");
 topMenuEl.style.height = "100%";
 topMenuEl.style.backgroundColor = "var(--top-menu-bg)";
 topMenuEl.classList.add("flex-around");
 
 let menuLinks = [
-  {text: 'about', href: '/about'},
-  {text: 'catalog', href: '#', subLinks: [
-    {text: 'all', href: '/catalog/all'},
-    {text: 'top selling', href: '/catalog/top'},
-    {text: 'search', href: '/catalog/search'},
-  ]},
-  {text: 'orders', href: '#' , subLinks: [
-    {text: 'new', href: '/orders/new'},
-    {text: 'pending', href: '/orders/pending'},
-    {text: 'history', href: '/orders/history'},
-  ]},
-  {text: 'account', href: '#', subLinks: [
-    {text: 'profile', href: '/account/profile'},
-    {text: 'sign out', href: '/account/signout'},
-  ]},
+  { text: "about", href: "/about" },
+  {
+    text: "catalog",
+    href: "#",
+    subLinks: [
+      { text: "all", href: "/catalog/all" },
+      { text: "top selling", href: "/catalog/top" },
+      { text: "search", href: "/catalog/search" },
+    ],
+  },
+  {
+    text: "orders",
+    href: "#",
+    subLinks: [
+      { text: "new", href: "/orders/new" },
+      { text: "pending", href: "/orders/pending" },
+      { text: "history", href: "/orders/history" },
+    ],
+  },
+  {
+    text: "account",
+    href: "#",
+    subLinks: [
+      { text: "profile", href: "/account/profile" },
+      { text: "sign out", href: "/account/signout" },
+    ],
+  },
 ];
-//
-let topMenueLinks = document.getElementsByTagName('a')
-document.addEventListener('click', e =>{
-  e.target.preventDefault();
-  if(e.target.matches('a') !== topMenueLinks) console.log(topMenueLinks)
-})
-//
+
 menuLinks.forEach((link) => {
   let newAElement = document.createElement("a");
   newAElement.href = link.href;
@@ -41,12 +48,25 @@ menuLinks.forEach((link) => {
 
 const subMenuEl = document.getElementById("sub-menu");
 subMenuEl.style.height = "100%";
-subMenuEl.style.backgroundColor = "var(--subMenu-bg)";
+subMenuEl.style.backgroundColor = "var(--sub-menu-bg)";
 subMenuEl.classList.add("flex-around");
 subMenuEl.style.position = "absolute";
 subMenuEl.style.top = "0";
 
-let ancorTags = document.querySelectorAll("a");
+let anchorTags = document.querySelectorAll("a");
+
+
+function buildSubmenu (links) {
+  subMenuEl.replaceChildren([]);
+  links.forEach((link) => {
+  let newAElement = document.createElement('a')
+  newAElement.href = link.href
+  newAElement.textContent = link.text
+  subMenuEl.appendChild(newAElement);
+  })
+
+
+}
 topMenuEl.addEventListener("click", (e) => {
   e.preventDefault();
   Array.from(e.target.parentElement.children).forEach((child) => {
@@ -56,29 +76,45 @@ topMenuEl.addEventListener("click", (e) => {
   });
 
   if (e.target.nodeName !== "A") return;
+
   console.log(e.target);
+
   if (e.target.classList.contains("active")) {
     e.target.classList.remove("active");
   } else {
     e.target.classList.add("active");
-    let ancorText = e.target.innerText.toLowerCase()
+    let anchorText = e.target.innerText.toLowerCase()
     let targetLink;
-    menuLinks.forEach((link)=>{
-      if(ancorText === link.text){
-        console.log(ancorText,link)
 
-        if(link.hasOwnProperty('subLinks')){
+    menuLinks.forEach((link) => {
+
+      if (anchorText === link.text) {
+
+        if (link.hasOwnProperty('subLinks')) {
           targetLink = link;
-          subMenuEl.style.top = '100%'
-          subMenuEl.style.backgroundColor ='blue'
-          return
-        }else{
-          subMenuEl.style.top = '0'
-          subMenuEl.style.display = 'none'
-          return
-        }
-      }
-    })
-  }
+          subMenuEl.style.top = '100%';
+          buildSubmenu(link.subLinks)
+          return;
 
+        } else {
+          subMenuEl.style.top = '0';
+          return;
+        };
+      };
+    });
+  };
 });
+
+subMenuEl.addEventListener('click', (e) => {
+  e.preventDefault();
+  if (e.target.nodeName !== 'A') return;
+  
+  subMenuEl.style.top = '0'
+  Array.from(topMenuEl.children).forEach((child) => {
+    if (child.classList.contains("active")) {
+      child.classList.remove("active");
+    }
+  })
+  mainEl.innerHTML = `<h1>${e.target.textContent.toLocaleUpperCase()}<h1/>`;
+
+})
